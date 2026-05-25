@@ -1,0 +1,34 @@
+# Node
+node_modules/
+package-lock.json
+
+# Vite build output
+dist/
+
+# Rust/Cargo
+target/
+Cargo.lock
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# ============================================================
+#  PRIVATE IMAGES — Your personal motivation photos
+#  All images in app/src/images/ are ignored EXCEPT the
+#  placeholder and the README. This prevents you from
+#  accidentally publishing personal photos to GitHub.
+# ============================================================
+app/src/images/*
+!app/src/images/placeholder.jpg
+!app/src/images/README.md

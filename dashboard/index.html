@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resort to Grow - Focus Dashboard</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    :root {
+      --bg-deep: #06070a;
+      --bg-card: #0c0e15;
+      --bg-card-hover: #121520;
+      --border-color: rgba(255, 255, 255, 0.04);
+      --border-color-hover: rgba(255, 255, 255, 0.1);
+      
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #4b5563;
+      
+      --amber: #f5a623;
+      --amber-soft: rgba(245, 166, 35, 0.08);
+      --amber-glow: rgba(245, 166, 35, 0.3);
+      
+      --green: #10b981;
+      --green-soft: rgba(16, 185, 129, 0.08);
+      --green-glow: rgba(16, 185, 129, 0.3);
+      
+      --red: #ef4444;
+      --red-soft: rgba(239, 68, 68, 0.08);
+      --red-glow: rgba(239, 68, 68, 0.3);
+      
+      --blue: #3b82f6;
+      --blue-soft: rgba(59, 130, 246, 0.08);
+      
+      --font: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-deep);
+      color: var(--text-primary);
+      font-family: var(--font);
+      line-height: 1.5;
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-deep);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #111827;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #1f2937;
+    }
+
+    /* Layout */
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-section h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 50%, var(--amber) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-section p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .month-filter {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .month-filter:focus, .month-filter:hover {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 2px var(--amber-soft);
+    }
+
+    /* Reality Check Banner */
+    .reality-check-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .reality-check-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .reality-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .reality-card.state-failing {
+      border-color: rgba(239, 68, 68, 0.2);
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.03) 0%, var(--bg-card) 100%);
+      box-shadow: 0 8px 32px rgba(239, 68, 68, 0.05);
+    }
+
+    .reality-card.state-warning {
+      border-color: rgba(245, 166, 35, 0.2);
+      background: linear-gradient(135deg, rgba(245, 166, 35, 0.03) 0%, var(--bg-card) 100%);
+      box-shadow: 0 8px 32px rgba(245, 166, 35, 0.05);
+    }
+
+    .reality-card.state-success {
+      border-color: rgba(16, 185, 129, 0.2);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.03) 0%, var(--bg-card) 100%);
+      box-shadow: 0 8px 32px rgba(16, 185, 129, 0.05);
+    }
+
+    .grade-circle {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 3.2rem;
+      font-weight: 900;
+      border: 4px solid var(--text-muted);
+      color: var(--text-muted);
+      flex-shrink: 0;
+      font-family: var(--font-mono);
+      transition: all 0.3s ease;
+    }
+
+    .state-failing .grade-circle {
+      border-color: var(--red);
+      color: var(--red);
+      box-shadow: 0 0 20px var(--red-glow), inset 0 0 10px rgba(239, 68, 68, 0.2);
+      animation: pulse-red 2s infinite;
+    }
+
+    .state-warning .grade-circle {
+      border-color: var(--amber);
+      color: var(--amber);
+      box-shadow: 0 0 20px var(--amber-glow), inset 0 0 10px rgba(245, 166, 35, 0.2);
+    }
+
+    .state-success .grade-circle {
+      border-color: var(--green);
+      color: var(--green);
+      box-shadow: 0 0 20px var(--green-glow), inset 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+
+    @keyframes pulse-red {
+      0% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); }
+      50% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
+      100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); }
+    }
+
+    .reality-details {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-grow: 1;
+    }
+
+    .reality-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .state-failing .reality-title { color: var(--red); }
+    .state-warning .reality-title { color: var(--amber); }
+    .state-success .reality-title { color: var(--green); }
+
+    .reality-text {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .integrity-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .integrity-bar-fill {
+      height: 100%;
+      background: var(--text-muted);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-color-hover);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--text-muted);
+    }
+
+    .stat-card.score::before { background: var(--amber); }
+    .stat-card.lost-time::before { background: var(--red); }
+    .stat-card.blocker::before { background: var(--blue); }
+    .stat-card.integrity::before { background: var(--green); }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+
+    .stat-value {
+      font-size: 2.1rem;
+      font-weight: 800;
+      margin-top: 8px;
+      letter-spacing: -0.8px;
+      line-height: 1.1;
+    }
+
+    .stat-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Charts Row */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 1024px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .chart-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+      min-height: 300px;
+      max-height: 300px;
+    }
+
+    /* Heatmap Card */
+    .heatmap-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .heatmap-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .heatmap-legend {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .legend-box {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    .legend-box.none { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.04); }
+    .legend-box.low { background: rgba(239, 68, 68, 0.25); border: 1px solid rgba(239, 68, 68, 0.4); }
+    .legend-box.med { background: rgba(245, 166, 35, 0.3); border: 1px solid rgba(245, 166, 35, 0.5); }
+    .legend-box.high { background: rgba(16, 185, 129, 0.35); border: 1px solid rgba(16, 185, 129, 0.55); }
+
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .day-cell {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .day-cell:hover {
+      transform: scale(1.08);
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      z-index: 10;
+    }
+
+    .day-number {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .day-cell.active-day .day-number {
+      color: #fff;
+    }
+
+    .day-score {
+      font-size: 0.65rem;
+      font-weight: 600;
+      margin-top: 2px;
+      opacity: 0.85;
+    }
+
+    .day-cell.focus-high {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.4);
+      box-shadow: inset 0 0 8px rgba(16, 185, 129, 0.08);
+    }
+    .day-cell.focus-high .day-score { color: var(--green); }
+
+    .day-cell.focus-med {
+      background: rgba(245, 166, 35, 0.18);
+      border-color: rgba(245, 166, 35, 0.4);
+      box-shadow: inset 0 0 8px rgba(245, 166, 35, 0.08);
+    }
+    .day-cell.focus-med .day-score { color: var(--amber); }
+
+    .day-cell.focus-low {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.4);
+      box-shadow: inset 0 0 8px rgba(239, 68, 68, 0.08);
+    }
+    .day-cell.focus-low .day-score { color: var(--red); }
+
+    .day-tooltip {
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: #11131a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.18s ease;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      z-index: 20;
+    }
+
+    .day-cell:hover .day-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .day-names {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      max-width: 500px;
+      margin: 0 auto 8px auto;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Logs Card */
+    .logs-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .logs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .logs-filters {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 0.88rem;
+      outline: none;
+      min-width: 240px;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--amber);
+      background: rgba(245, 166, 35, 0.01);
+    }
+
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+      border-color: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+    }
+
+    .filter-btn.active {
+      background: var(--amber-soft);
+      border-color: var(--amber);
+      color: var(--amber);
+      font-weight: 600;
+    }
+
+    /* Logs Table */
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.01);
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .time-col {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+    }
+
+    .badge.focused {
+      background: var(--green-soft);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .badge.struggled {
+      background: var(--red-soft);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+    }
+
+    .reason-badge {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .content-text {
+      color: var(--text-primary);
+      font-size: 0.88rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-container">
+    
+    <header>
+      <div class="brand-section">
+        <h1><span>⧉</span> RESORT TO GROW // FOCUS INSIGHTS</h1>
+        <p>Analyze your accountability sessions, blockers, and progress</p>
+      </div>
+      <div>
+        <select id="month-select" class="month-filter">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+    </header>
+
+    <!-- Reality Check / Motivation Panel -->
+    <div class="reality-check-container" id="reality-check-section">
+      <div class="reality-card" id="grade-card">
+        <div class="grade-circle" id="report-grade">-</div>
+        <div class="reality-details">
+          <span class="stat-label">Productivity Rating</span>
+          <div class="reality-title" id="grade-title">Calculating...</div>
+          <p class="reality-text" id="grade-description">Analyzing focus history...</p>
+        </div>
+      </div>
+      
+      <div class="reality-card" id="integrity-card">
+        <div class="reality-details">
+          <span class="stat-label">Self-Integrity Index</span>
+          <div class="reality-title" id="integrity-percentage">--% Promises Kept</div>
+          <div class="integrity-bar-bg">
+            <div class="integrity-bar-fill" id="integrity-bar-fill"></div>
+          </div>
+          <p class="reality-text" id="integrity-description" style="margin-top: 10px;">Tracking commitment updates...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Panel -->
+    <div class="stats-grid">
+      <div class="stat-card score">
+        <span class="stat-label">Focus Ratio</span>
+        <div class="stat-value" id="stat-focus-score">--%</div>
+        <div class="stat-sub" id="stat-score-sub">No history recorded</div>
+      </div>
+      
+      <div class="stat-card lost-time">
+        <span class="stat-label">Lost Focus Time</span>
+        <div class="stat-value" id="stat-lost-time" style="color: var(--red);">-- hours</div>
+        <div class="stat-sub" id="stat-lost-sub">Spent in procrastination</div>
+      </div>
+
+      <div class="stat-card blocker">
+        <span class="stat-label">Primary Weakness</span>
+        <div class="stat-value" id="stat-top-blocker" style="font-size: 1.6rem; padding-top: 8px;">--</div>
+        <div class="stat-sub" id="stat-blocker-sub">--</div>
+      </div>
+
+      <div class="stat-card integrity">
+        <span class="stat-label">Focus Daily Streak</span>
+        <div class="stat-value" id="stat-daily-streak">-- days</div>
+        <div class="stat-sub" id="stat-streak-sub">Days above 70% focus</div>
+      </div>
+    </div>
+
+    <!-- Charts and Heatmap Row -->
+    <div class="charts-grid">
+      <!-- Focus Trend Chart -->
+      <div class="chart-card">
+        <div class="chart-card-title">
+          <span>Focus Trend Over Time</span>
+          <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-secondary);">Daily averages</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="focusTrendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Heatmap/Calendar grid -->
+      <div class="heatmap-card">
+        <div class="heatmap-header">
+          <span style="font-weight: 700; font-size: 1.05rem;">Daily Heatmap</span>
+          <div class="heatmap-legend">
+            <span class="legend-box none" title="No check-ins"></span>
+            <span class="legend-box low" title="Low Focus (< 50%)"></span>
+            <span class="legend-box med" title="Medium Focus (50% - 75%)"></span>
+            <span class="legend-box high" title="High Focus (>= 75%)"></span>
+          </div>
+        </div>
+        
+        <div class="day-names">
+          <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+        </div>
+        <div class="heatmap-grid" id="heatmap-grid-container">
+          <!-- Generated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Blocker details & Hourly insights row -->
+    <div class="charts-grid">
+      <!-- Blocker distribution -->
+      <div class="chart-card">
+        <div class="chart-card-title">Blocker Breakdown</div>
+        <div class="chart-container" style="min-height: 250px; max-height: 250px;">
+          <canvas id="blockerChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Hourly Focus Peaks -->
+      <div class="chart-card">
+        <div class="chart-card-title">Hourly Focus Heatmap</div>
+        <div class="chart-container" style="min-height: 250px; max-height: 250px;">
+          <canvas id="hourlyChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Check-in Logs Table -->
+    <div class="logs-card">
+      <div class="logs-header">
+        <span style="font-weight: 700; font-size: 1.2rem;">Accountability Log</span>
+        
+        <div class="logs-filters">
+          <input type="text" id="log-search" class="search-input" placeholder="Search tasks, commitments, or blockers...">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="focused">Focused</button>
+          <button class="filter-btn" data-filter="struggled">Struggled</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table id="logs-table">
+          <thead>
+            <tr>
+              <th style="width: 15%">Time & Date</th>
+              <th style="width: 12%">Status</th>
+              <th style="width: 18%">Blocker / Satisfaction</th>
+              <th style="width: 55%">Task Action & Commitment</th>
+            </tr>
+          </thead>
+          <tbody id="logs-table-body">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // App State
+    let fullHistory = [];
+    let currentFilteredHistory = [];
+    let timerIntervalMinutes = 30; // default (will load from API)
+    let charts = {};
+
+    // Helper functions
+    function parseDate(isoString) {
+      return new Date(isoString);
+    }
+
+    function formatTime(date) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function formatDate(date) {
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function getMonthKey(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      return `${y}-${m}`;
+    }
+
+    // Load history data from server
+    async function loadData() {
+      try {
+        // Try fetching config first
+        const configResp = await fetch('/api/config');
+        if (configResp.ok) {
+          const configJson = await configResp.json();
+          timerIntervalMinutes = configJson.timerIntervalMinutes || 30;
+        }
+
+        const response = await fetch('/api/history');
+        if (!response.ok) throw new Error('API request failed');
+        fullHistory = await response.json();
+        
+        // Sort history by timestamp descending (newest first)
+        fullHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        setupMonthFilter();
+        renderDashboard();
+      } catch (err) {
+        console.error('Error fetching accountability history:', err);
+        // Fallback to demo data
+        fullHistory = generateMockData();
+        setupMonthFilter();
+        renderDashboard();
+      }
+    }
+
+    // Set up monthly drop-down selector
+    function setupMonthFilter() {
+      const monthSelect = document.getElementById('month-select');
+      monthSelect.innerHTML = '';
+      
+      const months = new Set();
+      fullHistory.forEach(entry => {
+        if (entry.timestamp) {
+          const date = new Date(entry.timestamp);
+          months.add(getMonthKey(date));
+        }
+      });
+
+      // Sort months newest first
+      const sortedMonths = Array.from(months).sort((a, b) => b.localeCompare(a));
+      
+      if (sortedMonths.length === 0) {
+        const curMonth = getMonthKey(new Date());
+        sortedMonths.push(curMonth);
+      }
+
+      sortedMonths.forEach(mKey => {
+        const [year, month] = mKey.split('-');
+        const date = new Date(year, parseInt(month) - 1, 1);
+        const name = date.toLocaleDateString([], { month: 'long', year: 'numeric' });
+        
+        const option = document.createElement('option');
+        option.value = mKey;
+        option.textContent = name;
+        monthSelect.appendChild(option);
+      });
+
+      monthSelect.value = sortedMonths[0];
+      monthSelect.addEventListener('change', renderDashboard);
+    }
+
+    // Main dashboard drawing
+    function renderDashboard() {
+      const selectedMonthKey = document.getElementById('month-select').value;
+      const [selYear, selMonth] = selectedMonthKey.split('-').map(Number);
+
+      // Filter history to selected month
+      currentFilteredHistory = fullHistory.filter(entry => {
+        if (!entry.timestamp) return false;
+        const d = new Date(entry.timestamp);
+        return d.getFullYear() === selYear && (d.getMonth() + 1) === selMonth;
+      });
+
+      calculateStats(selYear, selMonth);
+      renderHeatmap(selYear, selMonth);
+      renderCharts();
+      renderLogs();
+    }
+
+    // Calculations & Guilt Logic
+    function calculateStats(year, month) {
+      const total = currentFilteredHistory.length;
+      if (total === 0) {
+        document.getElementById('stat-focus-score').textContent = '0%';
+        document.getElementById('stat-score-sub').textContent = 'No records this month';
+        document.getElementById('stat-lost-time').textContent = '0 hours';
+        document.getElementById('stat-lost-sub').textContent = 'Pure focus';
+        document.getElementById('stat-top-blocker').textContent = 'None';
+        document.getElementById('stat-blocker-sub').textContent = 'Keep it up!';
+        document.getElementById('stat-daily-streak').textContent = '0 days';
+        document.getElementById('stat-streak-sub').textContent = 'No active streak';
+        
+        const gCard = document.getElementById('grade-card');
+        gCard.className = 'reality-card';
+        document.getElementById('report-grade').textContent = '-';
+        document.getElementById('grade-title').textContent = 'NO DATA';
+        document.getElementById('grade-description').textContent = 'Log check-ins to view reports.';
+
+        const iCard = document.getElementById('integrity-card');
+        iCard.className = 'reality-card';
+        document.getElementById('integrity-percentage').textContent = '--% Promises Kept';
+        document.getElementById('integrity-bar-fill').style.width = '0%';
+        document.getElementById('integrity-description').textContent = 'No data yet.';
+        return;
+      }
+
+      const productive = currentFilteredHistory.filter(e => e.entry_type === 'productive');
+      const struggled = currentFilteredHistory.filter(e => e.entry_type === 'struggled');
+      const satisfiedYes = productive.filter(e => e.satisfied === true || e.satisfied === 'yes');
+
+      // Focus score (Percentage of satisfied focused periods)
+      const focusRatio = Math.round((satisfiedYes.length / total) * 100);
+      document.getElementById('stat-focus-score').textContent = `${focusRatio}%`;
+      document.getElementById('stat-score-sub').textContent = `${satisfiedYes.length} satisfied / ${total} total check-ins`;
+
+      // Lost Focus Time (guilt statistic)
+      // Every struggle is assumed to cost the user one full interval
+      const lostHours = (struggled.length * timerIntervalMinutes) / 60;
+      document.getElementById('stat-lost-time').textContent = `${lostHours.toFixed(1)} hrs`;
+      document.getElementById('stat-lost-sub').textContent = `Lost to procrastination/slacking`;
+
+      // Primary Weakness
+      const blockerCounts = {};
+      struggled.forEach(e => {
+        const prob = (e.problem || 'unspecified').trim();
+        const label = prob.startsWith('custom:') || prob.startsWith('custom: ') ? 'custom' : prob;
+        blockerCounts[label] = (blockerCounts[label] || 0) + 1;
+      });
+
+      let topBlocker = 'None';
+      let maxCount = 0;
+      for (const [prob, count] of Object.entries(blockerCounts)) {
+        if (count > maxCount) {
+          maxCount = count;
+          topBlocker = prob;
+        }
+      }
+      document.getElementById('stat-top-blocker').textContent = topBlocker.toUpperCase();
+      document.getElementById('stat-blocker-sub').textContent = maxCount > 0 ? `Triggered ${maxCount} times` : 'Clean focus record';
+
+      // Self-Integrity calculation: Kept vs Broken promises
+      // Iterate chronological order (oldest to newest) to see if struggle was followed by focus.
+      const chronological = [...currentFilteredHistory].reverse();
+      let keptPromises = 0;
+      let brokenPromises = 0;
+      
+      for (let i = 0; i < chronological.length - 1; i++) {
+        if (chronological[i].entry_type === 'struggled') {
+          // Check if next entry is productive
+          const next = chronological[i + 1];
+          if (next.entry_type === 'productive') {
+            keptPromises++;
+          } else {
+            brokenPromises++;
+          }
+        }
+      }
+
+      const totalPromises = keptPromises + brokenPromises;
+      const integrityIndex = totalPromises > 0 ? Math.round((keptPromises / totalPromises) * 100) : 100;
+      
+      // Update Integrity display
+      document.getElementById('integrity-percentage').textContent = `${integrityIndex}% Promises Kept`;
+      const intFill = document.getElementById('integrity-bar-fill');
+      intFill.style.width = `${integrityIndex}%`;
+      const iCard = document.getElementById('integrity-card');
+      iCard.className = 'reality-card';
+      
+      if (integrityIndex < 50) {
+        intFill.style.backgroundColor = 'var(--red)';
+        iCard.classList.add('state-failing');
+        document.getElementById('integrity-description').textContent = 
+          `Integrity Alert: You break promises ${100 - integrityIndex}% of the time, Ayan. When you commit to a fix, follow through.`;
+      } else if (integrityIndex < 75) {
+        intFill.style.backgroundColor = 'var(--amber)';
+        iCard.classList.add('state-warning');
+        document.getElementById('integrity-description').textContent = 
+          `Room to improve: You followed through on ${keptPromises} of ${totalPromises} focus commitments. Stay consistent.`;
+      } else {
+        intFill.style.backgroundColor = 'var(--green)';
+        iCard.classList.add('state-success');
+        document.getElementById('integrity-description').textContent = 
+          `Strong discipline: You kept your word ${keptPromises} times! Your self-respect is high.`;
+      }
+
+      // Calculate Daily Focus Streak
+      const dailyFocusScores = {};
+      currentFilteredHistory.forEach(entry => {
+        const dateKey = new Date(entry.timestamp).getDate();
+        if (!dailyFocusScores[dateKey]) {
+          dailyFocusScores[dateKey] = { productive: 0, total: 0 };
+        }
+        dailyFocusScores[dateKey].total++;
+        if (entry.entry_type === 'productive') {
+          dailyFocusScores[dateKey].productive++;
+        }
+      });
+
+      const daysInMonth = new Date(year, month, 0).getDate();
+      let maxStreak = 0;
+      let curStreak = 0;
+      // Find longest sequence of days with focus ratio >= 70%
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dayStat = dailyFocusScores[d];
+        if (dayStat) {
+          const ratio = (dayStat.productive / dayStat.total) * 100;
+          if (ratio >= 70) {
+            curStreak++;
+            maxStreak = Math.max(maxStreak, curStreak);
+          } else {
+            curStreak = 0;
+          }
+        } else {
+          curStreak = 0;
+        }
+      }
+      document.getElementById('stat-daily-streak').textContent = `${maxStreak} days`;
+      document.getElementById('stat-streak-sub').textContent = `Max consecutive days above 70%`;
+
+      // Determine Focus Grade & Guilt Message
+      let grade = 'F';
+      let gradeTitle = 'DISASTROUS SLACKING';
+      let gradeDesc = '';
+      const gCard = document.getElementById('grade-card');
+      
+      // Reset classes
+      gCard.className = 'reality-card';
+
+      if (focusRatio >= 85) {
+        grade = 'A';
+        gradeTitle = 'ELITE FOCUS';
+        gradeDesc = `Excellent discipline, Ayan. You are respecting your goals and building real value. Keep this standard up!`;
+        gCard.classList.add('state-success');
+      } else if (focusRatio >= 70) {
+        grade = 'B';
+        gradeTitle = 'DECENT WORK';
+        gradeDesc = `Ayan, you are showing solid focus, but you are still losing ${lostHours.toFixed(1)} hours. Push further to unlock your potential.`;
+        gCard.classList.add('state-warning');
+      } else if (focusRatio >= 55) {
+        grade = 'C';
+        gradeTitle = 'SLACKING OFF';
+        gradeDesc = `You are slacking, Ayan. You lost ${lostHours.toFixed(1)} hours to distractions this month. Are you satisfied with just being average?`;
+        gCard.classList.add('state-warning');
+      } else if (focusRatio >= 40) {
+        grade = 'D';
+        gradeTitle = 'CRITICAL FAILING';
+        gradeDesc = `Ayan, you are failing your own standards. You are letting distractions win ${100 - focusRatio}% of the time. Wake up and code!`;
+        gCard.classList.add('state-failing');
+      } else {
+        grade = 'F';
+        gradeTitle = 'ZERO FOCUS & CONTROL';
+        gradeDesc = `AYAN, WHAT IS THIS? You wasted ${lostHours.toFixed(1)} hours this month. Stop breaking promises to yourself. Pick up the pace and commit.`;
+        gCard.classList.add('state-failing');
+      }
+
+      document.getElementById('report-grade').textContent = grade;
+      document.getElementById('grade-title').textContent = gradeTitle;
+      document.getElementById('grade-description').textContent = gradeDesc;
+    }
+
+    // Heatmap renderer (Calendar grid)
+    function renderHeatmap(year, month) {
+      const container = document.getElementById('heatmap-grid-container');
+      container.innerHTML = '';
+
+      const firstDayIdx = new Date(year, month - 1, 1).getDay(); // 0 Sunday, 1 Monday...
+      const daysInMonth = new Date(year, month, 0).getDate();
+      let startOffset = firstDayIdx === 0 ? 6 : firstDayIdx - 1;
+
+      // Group history by day
+      const dailyStats = {};
+      currentFilteredHistory.forEach(entry => {
+        const d = new Date(entry.timestamp);
+        const day = d.getDate();
+        if (!dailyStats[day]) {
+          dailyStats[day] = { productive: 0, total: 0 };
+        }
+        dailyStats[day].total++;
+        if (entry.entry_type === 'productive') {
+          dailyStats[day].productive++;
+        }
+      });
+
+      // Add empty spaces for offset days
+      for (let i = 0; i < startOffset; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'day-cell none';
+        emptyCell.style.opacity = '0';
+        emptyCell.style.pointerEvents = 'none';
+        container.appendChild(emptyCell);
+      }
+
+      // Add days
+      for (let d = 1; d <= daysInMonth; d++) {
+        const cell = document.createElement('div');
+        cell.className = 'day-cell active-day';
+
+        const stats = dailyStats[d];
+        let score = 0;
+        let tooltipText = `Day ${d}: No entries`;
+
+        if (stats) {
+          score = Math.round((stats.productive / stats.total) * 100);
+          tooltipText = `Day ${d}: ${score}% Focus (${stats.productive}/${stats.total} sessions)`;
+          
+          if (score >= 75) {
+            cell.classList.add('focus-high');
+          } else if (score >= 50) {
+            cell.classList.add('focus-med');
+          } else {
+            cell.classList.add('focus-low');
+          }
+        }
+
+        cell.innerHTML = `
+          <span class="day-number">${d}</span>
+          ${stats ? `<span class="day-score">${score}%</span>` : ''}
+          <div class="day-tooltip">${tooltipText}</div>
+        `;
+
+        container.appendChild(cell);
+      }
+    }
+
+    // Charts Generator
+    function renderCharts() {
+      const selectedMonthKey = document.getElementById('month-select').value;
+      const [year, month] = selectedMonthKey.split('-').map(Number);
+      const daysInMonth = new Date(year, month, 0).getDate();
+
+      const daysLabel = [];
+      const focusScores = [];
+      const checkinVolume = [];
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        daysLabel.push(`d${d}`);
+        const dayEntries = currentFilteredHistory.filter(e => new Date(e.timestamp).getDate() === d);
+        if (dayEntries.length === 0) {
+          focusScores.push(null);
+          checkinVolume.push(0);
+        } else {
+          const prod = dayEntries.filter(e => e.entry_type === 'productive').length;
+          focusScores.push(Math.round((prod / dayEntries.length) * 100));
+          checkinVolume.push(dayEntries.length);
+        }
+      }
+
+      if (charts.trend) charts.trend.destroy();
+      const trendCtx = document.getElementById('focusTrendChart').getContext('2d');
+      charts.trend = new Chart(trendCtx, {
+        type: 'line',
+        data: {
+          labels: daysLabel,
+          datasets: [
+            {
+              label: 'Focus Score (%)',
+              data: focusScores,
+              borderColor: '#f5a623',
+              backgroundColor: 'rgba(245, 166, 35, 0.03)',
+              borderWidth: 2,
+              spanGaps: true,
+              tension: 0.35,
+              fill: true,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Check-ins',
+              type: 'bar',
+              data: checkinVolume,
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderColor: 'rgba(59, 130, 246, 0.2)',
+              borderWidth: 1,
+              yAxisID: 'yVolume',
+              barThickness: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: '#9ca3af', font: { family: 'Outfit' } }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.01)' },
+              ticks: { color: '#6b7280', font: { family: 'Outfit', size: 10 } }
+            },
+            y: {
+              min: 0,
+              max: 100,
+              grid: { color: 'rgba(255,255,255,0.03)' },
+              ticks: { color: '#9ca3af', font: { family: 'Outfit' } },
+              title: { display: true, text: 'Percentage %', color: '#6b7280' }
+            },
+            yVolume: {
+              position: 'right',
+              min: 0,
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#6b7280', stepSize: 2 },
+              title: { display: true, text: 'Sessions Count', color: '#6b7280' }
+            }
+          }
+        }
+      });
+
+      // Blocker Chart
+      const blockerData = {};
+      currentFilteredHistory.forEach(entry => {
+        if (entry.entry_type === 'struggled') {
+          const prob = (entry.problem || 'unspecified').trim();
+          const label = (prob.startsWith('custom:') || prob.startsWith('custom: ')) ? 'custom problem' : prob;
+          blockerData[label] = (blockerData[label] || 0) + 1;
+        }
+      });
+
+      const labels = Object.keys(blockerData);
+      const counts = Object.values(blockerData);
+
+      if (charts.blocker) charts.blocker.destroy();
+      const blockerCtx = document.getElementById('blockerChart').getContext('2d');
+      
+      if (labels.length === 0) {
+        charts.blocker = new Chart(blockerCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Focused sessions only'],
+            datasets: [{ data: [1], backgroundColor: ['rgba(16, 185, 129, 0.1)'] }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+          }
+        });
+      } else {
+        charts.blocker = new Chart(blockerCtx, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: counts,
+              backgroundColor: [
+                'rgba(239, 68, 68, 0.65)',  // Red
+                'rgba(245, 166, 35, 0.65)', // Orange
+                'rgba(59, 130, 246, 0.65)',  // Blue
+                'rgba(163, 116, 255, 0.65)', // Purple
+                'rgba(16, 185, 129, 0.65)',  // Green
+                'rgba(229, 231, 235, 0.65)'  // Gray
+              ],
+              borderColor: '#06070a',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: { color: '#9ca3af', font: { family: 'Outfit', size: 12 } }
+              }
+            }
+          }
+        });
+      }
+
+      // Hourly Focus Peaks
+      const hourlyStats = Array.from({ length: 24 }, () => ({ productive: 0, total: 0 }));
+      currentFilteredHistory.forEach(entry => {
+        const hour = new Date(entry.timestamp).getHours();
+        hourlyStats[hour].total++;
+        if (entry.entry_type === 'productive') {
+          hourlyStats[hour].productive++;
+        }
+      });
+
+      const hourLabels = Array.from({ length: 24 }, (_, h) => `${String(h).padStart(2, '0')}:00`);
+      const hourlyScores = hourlyStats.map(stat => stat.total > 0 ? Math.round((stat.productive / stat.total) * 100) : 0);
+
+      if (charts.hourly) charts.hourly.destroy();
+      const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+      charts.hourly = new Chart(hourlyCtx, {
+        type: 'bar',
+        data: {
+          labels: hourLabels,
+          datasets: [
+            {
+              label: 'Avg Focus %',
+              data: hourlyScores,
+              backgroundColor: 'rgba(245, 166, 35, 0.55)',
+              borderColor: 'var(--amber)',
+              borderWidth: 1,
+              borderRadius: 3,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: '#6b7280', font: { family: 'Outfit', size: 9 }, maxRotation: 45 }
+            },
+            y: {
+              min: 0,
+              max: 100,
+              grid: { color: 'rgba(255,255,255,0.01)' },
+              ticks: { color: '#9ca3af', font: { family: 'Outfit' } }
+            }
+          }
+        }
+      });
+    }
+
+    // Render Logs Table
+    let activeFilter = 'all';
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        activeFilter = e.target.getAttribute('data-filter');
+        renderLogs();
+      });
+    });
+
+    document.getElementById('log-search').addEventListener('input', renderLogs);
+
+    function renderLogs() {
+      const tbody = document.getElementById('logs-table-body');
+      tbody.innerHTML = '';
+
+      const query = document.getElementById('log-search').value.toLowerCase().trim();
+
+      const filtered = currentFilteredHistory.filter(entry => {
+        if (activeFilter === 'focused' && entry.entry_type !== 'productive') return false;
+        if (activeFilter === 'struggled' && entry.entry_type !== 'struggled') return false;
+
+        if (query) {
+          const task = (entry.task || '').toLowerCase();
+          const commit = (entry.commitment || '').toLowerCase();
+          const problem = (entry.problem || '').toLowerCase();
+          return task.includes(query) || commit.includes(query) || problem.includes(query);
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-state">No matching log entries found.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(entry => {
+        const dateObj = new Date(entry.timestamp);
+        const timeStr = `${formatTime(dateObj)}<br><span style="font-size:0.75rem;color:var(--text-muted);">${formatDate(dateObj)}</span>`;
+        
+        const isProd = entry.entry_type === 'productive';
+        const badgeClass = isProd ? 'focused' : 'struggled';
+        const badgeText = isProd ? 'Focused' : 'Struggled';
+        
+        let blockerLabel = '';
+        if (isProd) {
+          blockerLabel = entry.satisfied === true || entry.satisfied === 'yes' 
+            ? '<span class="reason-badge" style="color:var(--green);border-color:rgba(16,185,129,0.15);">Fully Satisfied</span>'
+            : '<span class="reason-badge" style="color:var(--amber);border-color:rgba(245,166,35,0.15);">Low Focus</span>';
+        } else {
+          const prob = (entry.problem || 'unspecified').trim();
+          const isCustomProb = prob.startsWith('custom:') || prob.startsWith('custom: ');
+          const displayProb = isCustomProb ? 'custom' : prob;
+          blockerLabel = `<span class="reason-badge" style="color:var(--red);border-color:rgba(239,68,68,0.15);">${displayProb}</span>`;
+        }
+
+        let detailsHTML = '';
+        if (isProd) {
+          detailsHTML = `<div class="content-text"><strong>Task:</strong> ${entry.task || '<span style="color:var(--text-muted)">Unspecified</span>'}</div>`;
+        } else {
+          const probTrimmed = (entry.problem || '').trim();
+          const isCustom = probTrimmed.startsWith('custom:') || probTrimmed.startsWith('custom: ');
+          const customText = isCustom ? probTrimmed.replace(/^custom:\s*/, '').trim() : '';
+
+          detailsHTML = `
+            ${isCustom ? `<div class="content-text" style="margin-bottom:6px;"><strong>My Blocker:</strong> <span style="color:var(--text-primary); font-weight: 500;">"${customText}"</span></div>` : ''}
+            <div class="content-text"><strong>Blocker Advice:</strong> <span style="font-style:italic;color:var(--text-secondary);">${getBlockerAdvice(entry.problem)}</span></div>
+            ${entry.commitment ? `<div class="content-text" style="margin-top:6px;border-left:2px solid var(--amber);padding-left:8px;font-size:0.84rem;"><strong>Commitment:</strong> ${entry.commitment}</div>` : ''}
+          `;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="time-col">${timeStr}</td>
+          <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+          <td>${blockerLabel}</td>
+          <td>${detailsHTML}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function getBlockerAdvice(prob) {
+      if (!prob) return 'Take a breath and reset.';
+      const p = prob.toLowerCase();
+      if (p.includes('distraction')) return 'Close all irrelevant tabs. Set a 10-min timer on a single task.';
+      if (p.includes('laziness')) return 'Do the smallest possible action (e.g. write one line). Inertia is the enemy.';
+      if (p.includes('confusion')) return 'Write down your main objective in plain English. Simplify it by 50%.';
+      if (p.includes('low-energy') || p.includes('energy')) return 'Drink water. Stretch. Stand up for 60 seconds.';
+      if (p.startsWith('custom:') || p.startsWith('custom: ')) return 'You named the problem. Now write one concrete action to fix it.';
+      return 'Recognize the friction, write a commitment, and move forward.';
+    }
+
+    // Mock data generator for testing
+    function generateMockData() {
+      const mock = [];
+      const now = new Date();
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+        const checkins = Math.floor(Math.random() * 6);
+        for (let c = 0; c < checkins; c++) {
+          const entryDate = new Date(date);
+          entryDate.setHours(9 + Math.floor(Math.random() * 11), Math.floor(Math.random() * 60));
+          
+          const isProductive = Math.random() > 0.45;
+          if (isProductive) {
+            mock.push({
+              entry_type: 'productive',
+              problem: '',
+              satisfied: Math.random() > 0.3 ? 'yes' : 'no',
+              timestamp: entryDate.toISOString(),
+              task: ['Fixing auth bugs', 'Refactoring dashboard design', 'Writing test coverage', 'Team sync-up session', 'Drafting product features'][Math.floor(Math.random() * 5)],
+              commitment: ''
+            });
+          } else {
+            const prob = ['distraction', 'laziness', 'confusion', 'low-energy'][Math.floor(Math.random() * 4)];
+            mock.push({
+              entry_type: 'struggled',
+              problem: prob,
+              satisfied: false,
+              timestamp: entryDate.toISOString(),
+              task: '',
+              commitment: ['I will close Twitter and code', 'I will outline the task in code comments', 'I will drink a glass of water and stretch'][Math.floor(Math.random() * 3)]
+            });
+          }
+        }
+      }
+      return mock;
+    }
+
+    // Initial Load
+    window.addEventListener('DOMContentLoaded', loadData);
+  </script>
+</body>
+</html>

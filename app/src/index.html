@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Are You Working Hard?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body data-tauri-drag-region>
+  <div class="container" data-tauri-drag-region>
+    <!-- Progress bar -->
+    <div id="progress-bar">
+      <div id="progress-fill"></div>
+    </div>
+
+    <!-- Progress label -->
+    <div id="progress-label-row" class="hidden">
+      <span id="progress-label-text">Today's focus</span>
+      <span class="pct-badge" id="progress-pct-badge">0%</span>
+    </div>
+
+    <!-- Your photo — the emotional anchor -->
+    <div class="photo-section" id="main-photo-section">
+      <div class="photo-ring">
+        <img id="main-photo" src="/trigger.png" alt="Your reminder" />
+      </div>
+    </div>
+
+    <!-- Step flow indicator -->
+    <div id="step-flow-indicator"></div>
+
+    <!-- ========== STEP 1: The Check-In ========== -->
+    <div class="step fade-in" id="step-checkin">
+      <p class="greeting" id="greeting-text">Hey...</p>
+      <h1 class="main-question">Are you really working hard<br>right now?</h1>
+      <p class="sub-text" id="trigger-quote">"Your future self is watching."</p>
+      <div class="streak-display hidden" id="streak-display">
+        <span class="streak-count" id="streak-count">0</span>
+        <span class="streak-label">focused sessions in a row</span>
+      </div>
+      <div class="button-row">
+        <button id="btn-yes" class="btn btn-yes">
+          Yes, I am
+          <span class="key-hint">[Y]</span>
+        </button>
+        <div class="btn-no-wrapper" id="btn-no-wrapper">
+          <button id="btn-no" class="btn btn-no">
+            Not really
+            <span class="key-hint">[N]</span>
+          </button>
+        </div>
+      </div>
+      <button id="btn-summary" class="btn-link">Today's progress</button>
+    </div>
+
+    <!-- ========== STEP: "Not Really" — Plea Page ========== -->
+    <div class="step fade-in hidden" id="step-no-plea">
+      <div class="featured-image-card">
+        <img id="plea-image" src="/6.jpg" alt="Motivation" />
+      </div>
+      <h1 class="gentle-ask plea-question" id="plea-question">Ayan, Don't you want to me?</h1>
+      <div class="button-row mt-18">
+        <button id="btn-work-hard" class="btn btn-got-it">I will work hard</button>
+      </div>
+    </div>
+
+    <!-- ========== STEP: "Not Really" — Dual Images ========== -->
+    <div class="step fade-in hidden" id="step-no-images">
+      <div class="dual-image-container">
+        <div class="dual-image-card">
+          <img id="motivation-image-1" src="/3.png" alt="Motivation 1" />
+        </div>
+        <div class="dual-image-card">
+          <img id="motivation-image-2" src="/4.png" alt="Motivation 2" />
+        </div>
+      </div>
+      <div class="button-row mt-12">
+        <button id="btn-worthy" class="btn btn-got-it">I will become worthy of her</button>
+      </div>
+    </div>
+
+    <!-- ========== STEP: "Yes" — Journey Questions ========== -->
+    <div class="step fade-in hidden" id="step-yes-journey">
+      <div class="featured-image-card">
+        <img id="journey-image" src="/6.jpg" alt="Ayan" />
+      </div>
+      <h1 class="journey-question" id="journey-question">We will be together?</h1>
+      <div class="button-row mt-18">
+        <button id="btn-journey-answer" class="btn btn-got-it">Yes</button>
+      </div>
+    </div>
+
+    <!-- ========== STEP 2: Yes Path — Encouragement ========== -->
+    <div class="step fade-in hidden" id="step-yes">
+      <div class="status-icon status-good">
+        <div class="status-pulse"></div>
+      </div>
+      <h1 class="positive-text" id="yes-message">Good. Keep going.</h1>
+      <p class="sub-text" id="yes-sub">You're building something real. Don't stop now.</p>
+      <div class="task-log">
+        <label class="task-log-label" for="task-input">What are you working on right now? <span style="color:var(--red-soft)">*</span></label>
+        <input type="text" id="task-input" placeholder="e.g. writing the API layer" autocomplete="off" />
+        <p class="input-hint hidden" id="task-hint">You must write what you're working on before submitting.</p>
+      </div>
+      <div class="satisfaction-check">
+        <p class="satisfaction-label" id="satisfaction-label">Satisfied with your last session?</p>
+        <div class="button-row">
+          <button class="btn btn-small btn-satisfied" data-satisfied="yes">Yes</button>
+          <button class="btn btn-small btn-not-satisfied" data-satisfied="could-be-better">Could be better</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== STEP 3: No Path — Problem Picker ========== -->
+    <div class="step fade-in hidden" id="step-problem">
+      <h1 class="gentle-ask">What's getting in your way?</h1>
+      <p class="sub-text">Be honest with yourself. That's how you grow.</p>
+      <!-- Problem buttons rendered dynamically from config.js -->
+      <div class="problem-grid" id="problem-grid"></div>
+      <div class="custom-problem">
+        <input type="text" id="custom-problem-input" placeholder="Or type what's really stopping you..."
+          autocomplete="off" />
+        <button id="btn-custom-submit" class="btn btn-small btn-custom">Submit</button>
+      </div>
+    </div>
+
+    <!-- ========== STEP 4: Advice & Encouragement ========== -->
+    <div class="step fade-in hidden" id="step-advice">
+      <div class="advice-card">
+        <p class="advice-label">Do this right now:</p>
+        <p class="advice-action" id="advice-text">Action goes here</p>
+      </div>
+      <div class="encouragement">
+        <p class="encourage-text" id="encourage-text">"You're smarter than this. Find a way to adapt."</p>
+      </div>
+      <div class="task-log" id="commit-log">
+        <label class="task-log-label" for="commit-input">What do you commit to doing right now? <span style="color:var(--red-soft)">*</span></label>
+        <input type="text" id="commit-input" placeholder="e.g. I'll close Twitter and finish the task" autocomplete="off" />
+        <p class="input-hint hidden" id="commit-hint">Write your commitment before going back to work.</p>
+      </div>
+      <button id="btn-got-it" class="btn btn-got-it">
+        Got it. Back to work.
+        <span class="key-hint">[Enter]</span>
+      </button>
+    </div>
+
+
+    <!-- ========== STEP 5: Daily Summary ========== -->
+    <div class="step fade-in hidden" id="step-summary">
+      <!-- Dual photo header -->
+      <div class="summary-photo-duo">
+        <div class="summary-ring">
+          <img id="summary-photo-1" src="/trigger.png" alt="Photo 1" />
+        </div>
+        <div class="summary-ring summary-ring-warm">
+          <img id="summary-photo-2" src="/1.png" alt="Photo 2" />
+        </div>
+      </div>
+      <h1 class="summary-title">Today's Check-ins</h1>
+      <div class="summary-stats">
+        <div class="stat-card stat-productive">
+          <span class="stat-number" id="stat-productive">0</span>
+          <span class="stat-label">Focused</span>
+        </div>
+        <div class="stat-card stat-struggled">
+          <span class="stat-number" id="stat-struggled">0</span>
+          <span class="stat-label">Struggled</span>
+        </div>
+        <div class="stat-card stat-total">
+          <span class="stat-number" id="stat-total">0</span>
+          <span class="stat-label">Total</span>
+        </div>
+      </div>
+      <div class="summary-bar-container">
+        <div class="summary-bar">
+          <div class="summary-bar-fill" id="summary-bar-fill"></div>
+        </div>
+        <p class="summary-percent" id="summary-percent">0% focused today</p>
+      </div>
+      <div id="history-list" class="history-list"></div>
+      <button id="btn-back-from-summary" class="btn btn-small btn-back">Back</button>
+    </div>
+
+  </div>
+  <script type="module" src="/main.js"></script>
+</body>
+
+</html>
