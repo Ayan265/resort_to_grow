@@ -74,6 +74,11 @@ fn update_last_commitment(commitment: String) {
     save_history(&history);
 }
 
+#[tauri::command]
+fn reset_history() {
+    save_history(&Vec::new());
+}
+
 static TIMER_STARTED: AtomicBool = AtomicBool::new(false);
 
 #[tauri::command]
@@ -118,12 +123,8 @@ fn main() {
                 })
                 .build(app)?;
 
-            // Show window immediately on first launch so users know it works.
-            // After check-in, main.js hides it and the 30-min timer takes over.
-            if let Some(window) = app.get_webview_window("main") {
-                let _ = window.show();
-                let _ = window.set_focus();
-            }
+            // App starts hidden in the system tray.
+            // The first popup appears after the 30-min timer fires.
 
             Ok(())
         })
@@ -133,7 +134,7 @@ fn main() {
                 api.prevent_close();
             }
         })
-        .invoke_handler(tauri::generate_handler![record_checkin, start_timer, update_last_commitment])
+        .invoke_handler(tauri::generate_handler![record_checkin, start_timer, update_last_commitment, reset_history])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

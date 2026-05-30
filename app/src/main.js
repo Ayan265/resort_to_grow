@@ -62,6 +62,11 @@ function getCurrentStreak() {
   return streak;
 }
 
+function resetAllData() {
+  localStorage.removeItem(STORAGE_KEY);
+  tauriInvoke?.('reset_history').catch(() => {});
+}
+
 // =====================================================
 //  APPLY CONFIG TO DOM
 // =====================================================
