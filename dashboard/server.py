@@ -41,6 +41,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         elif self.path == '/api/config':
             import re
             timer_mins = 30
+            user_name = 'Friend'
             # Locate config.js relative to this server's directory (../app/src/config.js)
             config_path = Path(DIRECTORY).parent / 'app' / 'src' / 'config.js'
             if config_path.exists():
@@ -50,13 +51,17 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                         match = re.search(r'timerIntervalMinutes:\s*(\d+)', content)
                         if match:
                             timer_mins = int(match.group(1))
+                        # Extract user name from pleaQuestion (e.g. "Ayan, Don't you want me?")
+                        name_match = re.search(r"pleaQuestion:\s*['\"]([^,]+),", content)
+                        if name_match:
+                            user_name = name_match.group(1).strip()
                 except Exception:
                     pass
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            self.wfile.write(json.dumps({"timerIntervalMinutes": timer_mins}).encode('utf-8'))
+            self.wfile.write(json.dumps({"timerIntervalMinutes": timer_mins, "userName": user_name}).encode('utf-8'))
         else:
             super().do_GET()
 

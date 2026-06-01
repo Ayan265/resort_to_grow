@@ -814,6 +814,7 @@
     let fullHistory = [];
     let currentFilteredHistory = [];
     let timerIntervalMinutes = 30; // default (will load from API)
+    let userName = 'Friend'; // default (will load from API)
     let charts = {};
 
     // Helper functions
@@ -843,6 +844,7 @@
         if (configResp.ok) {
           const configJson = await configResp.json();
           timerIntervalMinutes = configJson.timerIntervalMinutes || 30;
+          userName = configJson.userName || 'Friend';
         }
 
         const response = await fetch('/api/history');
@@ -1010,7 +1012,7 @@
         intFill.style.backgroundColor = 'var(--red)';
         iCard.classList.add('state-failing');
         document.getElementById('integrity-description').textContent = 
-          `Integrity Alert: You break promises ${100 - integrityIndex}% of the time, Ayan. When you commit to a fix, follow through.`;
+          `Integrity Alert: You break promises ${100 - integrityIndex}% of the time, ${userName}. When you commit to a fix, follow through.`;
       } else if (integrityIndex < 75) {
         intFill.style.backgroundColor = 'var(--amber)';
         iCard.classList.add('state-warning');
@@ -1069,27 +1071,27 @@
       if (focusRatio >= 85) {
         grade = 'A';
         gradeTitle = 'ELITE FOCUS';
-        gradeDesc = `Excellent discipline, Ayan. You are respecting your goals and building real value. Keep this standard up!`;
+        gradeDesc = `Excellent discipline, ${userName}. You are respecting your goals and building real value. Keep this standard up!`;
         gCard.classList.add('state-success');
       } else if (focusRatio >= 70) {
         grade = 'B';
         gradeTitle = 'DECENT WORK';
-        gradeDesc = `Ayan, you are showing solid focus, but you are still losing ${lostHours.toFixed(1)} hours. Push further to unlock your potential.`;
+        gradeDesc = `${userName}, you are showing solid focus, but you are still losing ${lostHours.toFixed(1)} hours. Push further to unlock your potential.`;
         gCard.classList.add('state-warning');
       } else if (focusRatio >= 55) {
         grade = 'C';
         gradeTitle = 'SLACKING OFF';
-        gradeDesc = `You are slacking, Ayan. You lost ${lostHours.toFixed(1)} hours to distractions this month. Are you satisfied with just being average?`;
+        gradeDesc = `You are slacking, ${userName}. You lost ${lostHours.toFixed(1)} hours to distractions this month. Are you satisfied with just being average?`;
         gCard.classList.add('state-warning');
       } else if (focusRatio >= 40) {
         grade = 'D';
         gradeTitle = 'CRITICAL FAILING';
-        gradeDesc = `Ayan, you are failing your own standards. You are letting distractions win ${100 - focusRatio}% of the time. Wake up and code!`;
+        gradeDesc = `${userName}, you are failing your own standards. You are letting distractions win ${100 - focusRatio}% of the time. Wake up and code!`;
         gCard.classList.add('state-failing');
       } else {
         grade = 'F';
         gradeTitle = 'ZERO FOCUS & CONTROL';
-        gradeDesc = `AYAN, WHAT IS THIS? You wasted ${lostHours.toFixed(1)} hours this month. Stop breaking promises to yourself. Pick up the pace and commit.`;
+        gradeDesc = `${userName.toUpperCase()}, WHAT IS THIS? You wasted ${lostHours.toFixed(1)} hours this month. Stop breaking promises to yourself. Pick up the pace and commit.`;
         gCard.classList.add('state-failing');
       }
 
