@@ -1,8 +1,18 @@
-# Resort To Grow
+# Resort To Grow // Accountability & Focus
 
-A desktop app that pops up every 30 minutes and asks: **"Are you really working hard right now?"**
+A brutal, friction-based desktop app that interrupts you every 30 minutes and asks: **"Are you really working hard right now?"**
 
-It uses your own personal photos and messages to keep you honest with yourself. If you admit you're slacking, it makes you name the problem, read an action step, and write a commitment before it lets you go. If you're focused, it celebrates your streak.
+## Why Does This Exist? (The Philosophy)
+
+Most productivity tools assume you just need a better to-do list. **This tool assumes you are lying to yourself.** 
+
+We often sit at our desks, switch tabs, doom-scroll, or do "fake work," while telling ourselves we're being productive. **Resort To Grow** is designed to break that illusion. It acts as an aggressive accountability partner that lives on your computer.
+
+### How It Works: Emotional Friction
+Instead of just blocking websites (which you can easily bypass), this app uses **your own personal anchors**:
+- It uses **your own photos** (of yourself, your goals, or people you love) to remind you *why* you're working.
+- If you admit you're slacking ("Not really"), the app forces you through **intentional friction**. It makes you look at your motivation photos, select your exact problem (Laziness, Distraction, Confusion), and **type out a concrete commitment** before it lets you close the window.
+- It tracks your **Self-Integrity Index**: If you commit to working but slack off again 30 minutes later, the dashboard brutally fails your grade.
 
 Everything stays on your computer. No cloud. No tracking. Just you vs. you.
 

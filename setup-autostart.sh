@@ -60,8 +60,24 @@ StartupNotify=false
 X-GNOME-Autostart-enabled=true
 EOF
 
+# Create App Menu icon for the user to open the dashboard with one click
+echo "[4/4] Creating App Menu icon for the Dashboard..."
+APP_MENU_DIR="$HOME/.local/share/applications"
+mkdir -p "$APP_MENU_DIR"
+cat > "$APP_MENU_DIR/resort-to-grow-dashboard.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=Focus Insights
+Comment=Resort To Grow - Dashboard
+Exec=xdg-open http://localhost:1422
+Icon=$APP_DIR/src-tauri/icons/128x128.png
+Terminal=false
+Categories=Productivity;Utility;
+EOF
+
 echo ""
 echo "Done! Both the popup app and dashboard will start on login."
+echo "You can now find 'Focus Insights' in your application menu to open the dashboard."
 echo ""
 echo "To start them right now:"
 echo "  $BINARY &"

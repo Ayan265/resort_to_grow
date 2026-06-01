@@ -16,172 +16,235 @@ DIM='\033[2m'
 AMBER='\033[33m'
 GREEN='\033[32m'
 RED='\033[31m'
+CYAN='\033[36m'
 RESET='\033[0m'
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONFIG_FILE="$SCRIPT_DIR/app/src/config.js"
 IMAGES_DIR="$SCRIPT_DIR/app/src/images"
 
+clear 2>/dev/null || true
 echo ""
-echo -e "${BOLD}╔══════════════════════════════════════════════════╗${RESET}"
-echo -e "${BOLD}║     RESORT TO GROW — Personalization Wizard      ║${RESET}"
-echo -e "${BOLD}╚══════════════════════════════════════════════════╝${RESET}"
+echo -e "${BOLD}╔══════════════════════════════════════════════════════╗${RESET}"
+echo -e "${BOLD}║       RESORT TO GROW — Personalization Wizard       ║${RESET}"
+echo -e "${BOLD}╚══════════════════════════════════════════════════════╝${RESET}"
 echo ""
-echo -e "${DIM}This wizard will walk you through making the app yours.${RESET}"
-echo -e "${DIM}Just answer the questions — no coding needed.${RESET}"
+echo -e "${CYAN}${BOLD}What is this app?${RESET}"
 echo ""
+echo -e "  This app pops up every 30 minutes while you work and"
+echo -e "  asks: ${BOLD}\"Are you really working hard right now?\"${RESET}"
+echo ""
+echo -e "  If you say ${GREEN}YES${RESET} → It shows affirmation screens with your"
+echo -e "  photos, asks what you're working on, and closes."
+echo ""
+echo -e "  If you say ${RED}NOT REALLY${RESET} → It shows your motivation photos,"
+echo -e "  makes you wait 15 seconds per screen (to absorb the guilt),"
+echo -e "  asks what's blocking you, and makes you write a commitment"
+echo -e "  before it lets you go back to work."
+echo ""
+echo -e "${DIM}  The idea: It uses YOUR personal photos and messages to"
+echo -e "  hold you emotionally accountable. That's why we need"
+echo -e "  you to set it up with images that matter to YOU.${RESET}"
+echo ""
+echo -e "${DIM}  Press Enter to start the setup...${RESET}"
+read -r
 
 # ────────────────────────────────────────────────────────────
 #  STEP 1: Your Name
 # ────────────────────────────────────────────────────────────
 
-echo -e "${AMBER}${BOLD}Step 1 of 5: Your Name${RESET}"
-echo -e "The app uses your name in motivational messages."
+clear 2>/dev/null || true
 echo ""
-read -rp "   What's your name? " USER_NAME
+echo -e "${AMBER}${BOLD}━━━ Step 1 of 5: Your Name ━━━${RESET}"
+echo ""
+echo -e "  The app uses your name in motivation messages."
+echo -e "  For example: ${DIM}\"Ayan, don't you want to achieve your goals?\"${RESET}"
+echo ""
+read -rp "  What's your name? " USER_NAME
 USER_NAME="${USER_NAME:-Friend}"
-echo -e "   ${GREEN}✓${RESET} Got it, ${BOLD}$USER_NAME${RESET}."
 echo ""
+echo -e "  ${GREEN}✓${RESET} Got it, ${BOLD}$USER_NAME${RESET}."
+sleep 1
 
 # ────────────────────────────────────────────────────────────
 #  STEP 2: Timer Interval
 # ────────────────────────────────────────────────────────────
 
-echo -e "${AMBER}${BOLD}Step 2 of 5: Check-in Frequency${RESET}"
-echo -e "How often should the popup interrupt you? (in minutes)"
-echo -e "${DIM}   Common choices: 15, 20, 30, 45, 60${RESET}"
+clear 2>/dev/null || true
 echo ""
-read -rp "   Minutes between popups [30]: " TIMER_MINS
+echo -e "${AMBER}${BOLD}━━━ Step 2 of 5: How Often Should It Pop Up? ━━━${RESET}"
+echo ""
+echo -e "  The popup will interrupt your work at this interval."
+echo -e "  It does NOT pop up when you first log in — only after"
+echo -e "  the first interval passes."
+echo ""
+echo -e "  ${DIM}Common choices:${RESET}"
+echo -e "    ${BOLD}15${RESET} min — Very aggressive (for hardcore focus)"
+echo -e "    ${BOLD}30${RESET} min — Recommended (balanced)"
+echo -e "    ${BOLD}60${RESET} min — Gentle (once per hour)"
+echo ""
+read -rp "  Minutes between popups [30]: " TIMER_MINS
 TIMER_MINS="${TIMER_MINS:-30}"
 
 # Validate it's a number
 if ! [[ "$TIMER_MINS" =~ ^[0-9]+$ ]] || [ "$TIMER_MINS" -lt 1 ]; then
-  echo -e "   ${RED}That doesn't look right. Using 30 minutes.${RESET}"
+  echo -e "  ${RED}Invalid input. Using 30 minutes.${RESET}"
   TIMER_MINS=30
 fi
 
-echo -e "   ${GREEN}✓${RESET} The popup will appear every ${BOLD}$TIMER_MINS minutes${RESET}."
 echo ""
+echo -e "  ${GREEN}✓${RESET} Popup will appear every ${BOLD}$TIMER_MINS minutes${RESET}."
+sleep 1
 
 # ────────────────────────────────────────────────────────────
 #  STEP 3: Personal Images
 # ────────────────────────────────────────────────────────────
 
-echo -e "${AMBER}${BOLD}Step 3 of 5: Your Motivation Images${RESET}"
-echo -e "The app shows personal images during check-ins to keep you"
-echo -e "emotionally connected to your goals."
+clear 2>/dev/null || true
 echo ""
-echo -e "You need ${BOLD}6 images${RESET}. They can be photos of:"
-echo -e "   • Yourself  • Someone you love  • Your goals"
-echo -e "   • Anything that makes you want to work harder"
+echo -e "${AMBER}${BOLD}━━━ Step 3 of 5: Your Motivation Images ━━━${RESET}"
 echo ""
-echo -e "${DIM}Supported formats: .jpg, .jpeg, .png, .webp${RESET}"
-echo -e "${DIM}Best size: under 500 KB each, square or portrait.${RESET}"
+echo -e "  ${BOLD}This is the most important part.${RESET}"
 echo ""
-
-# List current images
-echo -e "Images currently in your images folder (${DIM}$IMAGES_DIR${RESET}):"
+echo -e "  The app shows personal images on different screens."
+echo -e "  Use photos of yourself, someone you love, your goals,"
+echo -e "  or anything that makes you want to work harder."
 echo ""
-EXISTING_IMAGES=$(find "$IMAGES_DIR" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) ! -name 'placeholder.jpg' 2>/dev/null | sort)
-
-if [ -z "$EXISTING_IMAGES" ]; then
-  echo -e "   ${RED}(no images found — only the placeholder)${RESET}"
-else
-  i=1
-  while IFS= read -r img; do
-    echo -e "   $i. $(basename "$img")"
-    ((i++))
-  done <<< "$EXISTING_IMAGES"
-fi
+echo -e "  ${CYAN}The app has 6 image slots:${RESET}"
+echo ""
+echo -e "  ${BOLD}1. Main Photo${RESET}"
+echo -e "     ${DIM}A circular photo on the check-in screen (the first thing you see).${RESET}"
+echo -e "     ${DIM}Best: a photo of yourself or a close-up of someone you love.${RESET}"
+echo ""
+echo -e "  ${BOLD}2. Plea Image${RESET}"
+echo -e "     ${DIM}Shown when you click \"Not really\" — a big image to guilt-trip you.${RESET}"
+echo -e "     ${DIM}Best: a powerful emotional photo.${RESET}"
+echo ""
+echo -e "  ${BOLD}3. Left Motivation Image${RESET}"
+echo -e "     ${DIM}Left side of the dual-image screen (second \"Not really\" screen).${RESET}"
+echo ""
+echo -e "  ${BOLD}4. Right Motivation Image${RESET}"
+echo -e "     ${DIM}Right side of the dual-image screen.${RESET}"
+echo ""
+echo -e "  ${BOLD}5. Summary Left Photo${RESET}"
+echo -e "     ${DIM}Small ring photo on the daily progress page.${RESET}"
+echo ""
+echo -e "  ${BOLD}6. Summary Right Photo${RESET}"
+echo -e "     ${DIM}Second ring photo on the daily progress page.${RESET}"
+echo ""
+echo -e "  ${CYAN}How to add images:${RESET}"
+echo -e "  • Type the ${BOLD}full path${RESET} to an image file on your computer"
+echo -e "    (e.g. ${DIM}/home/you/Pictures/photo.jpg${RESET})"
+echo -e "  • OR drag the file from your file manager into this terminal"
+echo -e "  • OR just press Enter to use the placeholder for now"
+echo ""
+echo -e "  ${DIM}Supported formats: .jpg .jpeg .png .webp${RESET}"
+echo -e "  ${DIM}Best size: under 500 KB, square or portrait.${RESET}"
 echo ""
 
 IMAGE_NAMES=("mainPhoto" "pleaImage" "motivationLeft" "motivationRight" "summaryLeft" "summaryRight")
 IMAGE_LABELS=(
-  "Main Photo (circular image on the check-in screen)"
-  "Plea Image (shown when you click 'Not really')"
-  "Left Motivation Image (left side of the motivation screen)"
-  "Right Motivation Image (right side of the motivation screen)"
-  "Summary Photo Left (left ring on the progress page)"
-  "Summary Photo Right (right ring on the progress page)"
+  "1. Main Photo (circular check-in image)"
+  "2. Plea Image (guilt-trip image)"
+  "3. Left Motivation Image"
+  "4. Right Motivation Image"
+  "5. Summary Left Photo"
+  "6. Summary Right Photo"
 )
 
 declare -A IMAGE_FILES
 
-echo -e "Now, either ${BOLD}drag and drop${RESET} image files into this folder:"
-echo -e "   ${DIM}$IMAGES_DIR${RESET}"
-echo ""
-echo -e "Or type the filename for each slot. If the file is already"
-echo -e "in the images folder, just type the name (e.g. ${DIM}photo.jpg${RESET})."
-echo -e "Press Enter to keep the current image (shown in brackets)."
-echo ""
-
-# Defaults from current config
-CURRENT_DEFAULTS=("/trigger.png" "/6.jpg" "/3.png" "/4.png" "/trigger.png" "/1.png")
-
 for idx in "${!IMAGE_NAMES[@]}"; do
   label="${IMAGE_LABELS[$idx]}"
-  default="${CURRENT_DEFAULTS[$idx]}"
-  default_name=$(basename "$default")
 
-  read -rp "   ${label} [${default_name}]: " chosen
-  chosen="${chosen:-$default_name}"
+  read -rp "  ${label}
+  Path or Enter to skip: " chosen
 
-  # If they gave a full path, copy it to images dir
-  if [[ "$chosen" == /* ]] || [[ "$chosen" == ~/* ]]; then
+  # Trim whitespace and surrounding quotes (drag-drop often adds quotes)
+  chosen=$(echo "$chosen" | sed "s/^['\"]//;s/['\"]$//;s/^[[:space:]]*//;s/[[:space:]]*$//")
+
+  if [ -z "$chosen" ]; then
+    IMAGE_FILES[${IMAGE_NAMES[$idx]}]="/placeholder.jpg"
+    echo -e "  ${DIM}→ Using placeholder${RESET}"
+  else
+    # Expand ~ to $HOME
     expanded_path="${chosen/#\~/$HOME}"
+
     if [ -f "$expanded_path" ]; then
-      cp "$expanded_path" "$IMAGES_DIR/"
-      chosen=$(basename "$expanded_path")
-      echo -e "   ${GREEN}✓${RESET} Copied to images folder."
+      # Copy the file into images/ dir
+      filename=$(basename "$expanded_path")
+      cp "$expanded_path" "$IMAGES_DIR/$filename"
+      IMAGE_FILES[${IMAGE_NAMES[$idx]}]="/$filename"
+      echo -e "  ${GREEN}✓${RESET} Copied ${BOLD}$filename${RESET} to images folder."
     else
-      echo -e "   ${RED}File not found. Using default: $default_name${RESET}"
-      chosen="$default_name"
+      echo -e "  ${RED}File not found: $expanded_path${RESET}"
+      echo -e "  ${DIM}→ Using placeholder instead${RESET}"
+      IMAGE_FILES[${IMAGE_NAMES[$idx]}]="/placeholder.jpg"
     fi
   fi
-
-  # Make sure it starts with /
-  [[ "$chosen" != /* ]] && chosen="/$chosen"
-  IMAGE_FILES[${IMAGE_NAMES[$idx]}]="$chosen"
+  echo ""
 done
 
-echo ""
-echo -e "   ${GREEN}✓${RESET} Images configured."
-echo ""
+echo -e "  ${GREEN}✓${RESET} Images configured."
+sleep 1
 
 # ────────────────────────────────────────────────────────────
 #  STEP 4: Personal Messages
 # ────────────────────────────────────────────────────────────
 
-echo -e "${AMBER}${BOLD}Step 4 of 5: Personal Messages${RESET}"
-echo -e "These appear on the \"Not really\" screens."
-echo -e "Press Enter to keep the current message."
+clear 2>/dev/null || true
+echo ""
+echo -e "${AMBER}${BOLD}━━━ Step 4 of 5: Your Personal Messages ━━━${RESET}"
+echo ""
+echo -e "  These messages appear when you click \"Not really\"."
+echo ""
+echo -e "  ${BOLD}Screen 1: The Plea Screen${RESET}"
+echo -e "  ${DIM}Shows your plea image with a question and a button.${RESET}"
 echo ""
 
-read -rp "   Plea question (shown with your image when you're slacking)
-   [$USER_NAME, Don't you want me?]: " PLEA_Q
-PLEA_Q="${PLEA_Q:-$USER_NAME, Don\'t you want me?}"
+read -rp "  Plea question (e.g. \"$USER_NAME, don't you want to succeed?\")
+  [${USER_NAME}, don't you want to achieve your goals?]: " PLEA_Q
+PLEA_Q="${PLEA_Q:-${USER_NAME}, don\'t you want to achieve your goals?}"
 
-read -rp "   Plea button text [I will work hard]: " PLEA_BTN
+echo ""
+read -rp "  Plea button text [I will work hard]: " PLEA_BTN
 PLEA_BTN="${PLEA_BTN:-I will work hard}"
 
-read -rp "   Second motivation button text [I have to become worthy]: " WORTHY_BTN
+echo ""
+echo -e "  ${BOLD}Screen 2: The Dual Image Screen${RESET}"
+echo -e "  ${DIM}Shows two motivation images side by side with a button.${RESET}"
+echo ""
+
+read -rp "  Button text [I have to become worthy]: " WORTHY_BTN
 WORTHY_BTN="${WORTHY_BTN:-I have to become worthy}"
 
 echo ""
-echo -e "   ${GREEN}✓${RESET} Messages set."
-echo ""
+echo -e "  ${GREEN}✓${RESET} Messages set."
+sleep 1
 
 # ────────────────────────────────────────────────────────────
 #  STEP 5: Journey Affirmations
 # ────────────────────────────────────────────────────────────
 
-echo -e "${AMBER}${BOLD}Step 5 of 5: Affirmation Journey${RESET}"
-echo -e "When you click \"Yes, I am working hard\", the app shows a"
-echo -e "series of affirmation screens. Each has a statement and"
-echo -e "an image."
+clear 2>/dev/null || true
 echo ""
-echo -e "How many affirmation steps do you want? (1-5)"
-read -rp "   Number of steps [3]: " JOURNEY_COUNT
+echo -e "${AMBER}${BOLD}━━━ Step 5 of 5: Affirmation Journey ━━━${RESET}"
+echo ""
+echo -e "  When you click ${GREEN}\"Yes, I am\"${RESET}, the app shows a series of"
+echo -e "  affirmation screens before logging your work."
+echo ""
+echo -e "  Each screen has:"
+echo -e "    • A ${BOLD}statement${RESET} (your affirmation)"
+echo -e "    • A ${BOLD}button${RESET} (to confirm and continue)"
+echo -e "    • An ${BOLD}image${RESET} (a motivation photo)"
+echo ""
+echo -e "  ${DIM}Example:${RESET}"
+echo -e "    Statement: \"I am becoming the best version of myself.\""
+echo -e "    Button: \"Yes, I am.\""
+echo -e "    Image: /photo.jpg"
+echo ""
+
+read -rp "  How many affirmation steps? (1-5) [3]: " JOURNEY_COUNT
 JOURNEY_COUNT="${JOURNEY_COUNT:-3}"
 if ! [[ "$JOURNEY_COUNT" =~ ^[0-9]+$ ]] || [ "$JOURNEY_COUNT" -lt 1 ] || [ "$JOURNEY_COUNT" -gt 5 ]; then
   JOURNEY_COUNT=3
@@ -191,31 +254,60 @@ JOURNEY_QUESTIONS=()
 JOURNEY_BUTTONS=()
 JOURNEY_IMAGES=()
 
+DEFAULT_STATEMENTS=(
+  "I am becoming the best version of myself."
+  "Every minute of focus brings me closer to my goals."
+  "I will not waste this opportunity."
+  "The work I do today defines my tomorrow."
+  "I refuse to be average."
+)
+DEFAULT_BUTTONS=("Yes, I am." "Absolutely." "Never." "Let's go." "Always.")
+
 for ((j=1; j<=JOURNEY_COUNT; j++)); do
   echo ""
-  echo -e "   ${BOLD}Affirmation #$j:${RESET}"
-  read -rp "      Statement: " jq
-  jq="${jq:-I am becoming the best version of myself}"
+  echo -e "  ${BOLD}── Affirmation #$j ──${RESET}"
+  idx=$((j-1))
+
+  default_q="${DEFAULT_STATEMENTS[$idx]}"
+  read -rp "  Statement [$default_q]: " jq
+  jq="${jq:-$default_q}"
   JOURNEY_QUESTIONS+=("$jq")
 
-  read -rp "      Button text [Yes]: " jb
-  jb="${jb:-Yes}"
+  default_b="${DEFAULT_BUTTONS[$idx]}"
+  read -rp "  Button text [$default_b]: " jb
+  jb="${jb:-$default_b}"
   JOURNEY_BUTTONS+=("$jb")
 
-  read -rp "      Image filename [placeholder.jpg]: " ji
-  ji="${ji:-placeholder.jpg}"
-  [[ "$ji" != /* ]] && ji="/$ji"
-  JOURNEY_IMAGES+=("$ji")
+  read -rp "  Image path (or Enter for placeholder): " ji
+  ji=$(echo "$ji" | sed "s/^['\"]//;s/['\"]$//;s/^[[:space:]]*//;s/[[:space:]]*$//")
+
+  if [ -z "$ji" ]; then
+    JOURNEY_IMAGES+=("/placeholder.jpg")
+    echo -e "  ${DIM}→ Using placeholder${RESET}"
+  else
+    expanded="${ji/#\~/$HOME}"
+    if [ -f "$expanded" ]; then
+      fname=$(basename "$expanded")
+      cp "$expanded" "$IMAGES_DIR/$fname"
+      JOURNEY_IMAGES+=("/$fname")
+      echo -e "  ${GREEN}✓${RESET} Copied ${BOLD}$fname${RESET}"
+    else
+      echo -e "  ${RED}File not found. Using placeholder.${RESET}"
+      JOURNEY_IMAGES+=("/placeholder.jpg")
+    fi
+  fi
 done
 
 echo ""
-echo -e "   ${GREEN}✓${RESET} Journey configured with ${BOLD}$JOURNEY_COUNT${RESET} steps."
-echo ""
+echo -e "  ${GREEN}✓${RESET} Journey configured with ${BOLD}$JOURNEY_COUNT${RESET} steps."
+sleep 1
 
 # ────────────────────────────────────────────────────────────
 #  GENERATE CONFIG.JS
 # ────────────────────────────────────────────────────────────
 
+clear 2>/dev/null || true
+echo ""
 echo -e "${AMBER}${BOLD}Generating your config...${RESET}"
 
 # Escape single quotes in strings for JS
@@ -241,7 +333,7 @@ PLEA_Q_ESC=$(escape_js "$PLEA_Q")
 PLEA_BTN_ESC=$(escape_js "$PLEA_BTN")
 WORTHY_BTN_ESC=$(escape_js "$WORTHY_BTN")
 
-cat > "$CONFIG_FILE" << CONFIGEOF
+cat > "$CONFIG_FILE" <<CONFIGEOF
 // ================================================================
 //  CONFIG.JS — All your personal customizations live here.
 //  You do NOT need to touch any other file to change the content.
@@ -402,37 +494,53 @@ ${JOURNEY_JS}  ],
 };
 CONFIGEOF
 
-echo -e "   ${GREEN}✓${RESET} Config saved to ${DIM}$CONFIG_FILE${RESET}"
+echo -e "  ${GREEN}✓${RESET} Config saved to ${DIM}$CONFIG_FILE${RESET}"
 echo ""
 
 # ────────────────────────────────────────────────────────────
 #  ASK IF USER WANTS TO BUILD NOW
 # ────────────────────────────────────────────────────────────
 
-echo -e "${BOLD}╔══════════════════════════════════════════════════╗${RESET}"
-echo -e "${BOLD}║               Personalization Complete!           ║${RESET}"
-echo -e "${BOLD}╚══════════════════════════════════════════════════╝${RESET}"
+echo -e "${BOLD}╔══════════════════════════════════════════════════════╗${RESET}"
+echo -e "${BOLD}║             Personalization Complete!                ║${RESET}"
+echo -e "${BOLD}╚══════════════════════════════════════════════════════╝${RESET}"
 echo ""
-echo -e "Your settings have been saved. Next steps:"
+echo -e "  ${BOLD}What happens next:${RESET}"
 echo ""
-echo -e "  ${BOLD}1.${RESET} Make sure your images are in:  ${DIM}$IMAGES_DIR${RESET}"
-echo -e "  ${BOLD}2.${RESET} Build and install the app:     ${BOLD}./setup-autostart.sh${RESET}"
+echo -e "  The app needs to be built (compiled) before it can run."
+echo -e "  This takes about 1-2 minutes the first time."
 echo ""
-read -rp "Would you like to build and install now? [Y/n]: " DO_BUILD
+echo -e "  After building, it will:"
+echo -e "    • Install a tray icon (small icon in your taskbar)"
+echo -e "    • Start popping up every ${BOLD}$TIMER_MINS minutes${RESET}"
+echo -e "    • Auto-start when you log in to your computer"
+echo ""
+read -rp "  Build and install now? [Y/n]: " DO_BUILD
 DO_BUILD="${DO_BUILD:-Y}"
 
 if [[ "$DO_BUILD" =~ ^[Yy] ]]; then
   echo ""
   echo -e "${AMBER}Building and installing...${RESET}"
+  echo -e "${DIM}(This takes 1-2 minutes — please wait)${RESET}"
+  echo ""
   # Remove old binary so setup-autostart.sh rebuilds
   rm -f "$SCRIPT_DIR/app/src-tauri/target/release/accountability-app"
   bash "$SCRIPT_DIR/setup-autostart.sh"
   echo ""
-  echo -e "${GREEN}${BOLD}All done!${RESET} The app is now running and will start on login."
-  echo -e "Right-click the tray icon → ${BOLD}Dashboard${RESET} to see your progress."
+  echo -e "${GREEN}${BOLD}All done!${RESET}"
+  echo ""
+  echo -e "  The app is now running in your system tray."
+  echo -e "  The first popup will appear in ${BOLD}$TIMER_MINS minutes${RESET}."
+  echo ""
+  echo -e "  ${BOLD}To see your dashboard:${RESET}"
+  echo -e "    • Right-click the tray icon → Dashboard"
+  echo -e "    • Or open ${CYAN}http://localhost:1422${RESET} in your browser"
+  echo ""
+  echo -e "  ${BOLD}To change settings later:${RESET}"
+  echo -e "    Just run ${BOLD}./personalize.sh${RESET} again."
 else
   echo ""
-  echo -e "No problem! When you're ready, run:  ${BOLD}./setup-autostart.sh${RESET}"
+  echo -e "  No problem! When you're ready, run:  ${BOLD}./setup-autostart.sh${RESET}"
 fi
 
 echo ""
