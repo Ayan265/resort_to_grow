@@ -172,6 +172,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnYes     = document.getElementById('btn-yes');
   const btnNo      = document.getElementById('btn-no');
   const btnSummary = document.getElementById('btn-summary');
+  const btnDashboard = document.getElementById('btn-dashboard');
+  const btnDashboardFromSummary = document.getElementById('btn-dashboard-from-summary');
 
   // --- DOM: Journey (Yes path) ---
   const btnJourneyAnswer  = document.getElementById('btn-journey-answer');
@@ -401,6 +403,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     showStep(stepSummary);
     currentStep = 'summary';
   });
+
+  // --- Dashboard buttons ---
+  function openDashboard() {
+    const url = CONFIG.dashboardUrl || 'http://localhost:1422';
+    if (tauriInvoke) {
+      tauriInvoke('open_dashboard', { url }).catch(() => {
+        window.open(url, '_blank');
+      });
+    } else {
+      window.open(url, '_blank');
+    }
+  }
+
+  btnDashboard.addEventListener('click', openDashboard);
+  btnDashboardFromSummary.addEventListener('click', openDashboard);
 
   // =====================================================
   //  YES PATH — Journey Questions

@@ -589,6 +589,52 @@ body::before {
   text-decoration-color: rgba(160, 170, 180, 0.5);
 }
 
+/* Footer links row (Today's progress · Open Dashboard) */
+.checkin-footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.link-separator {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  opacity: 0.5;
+  user-select: none;
+}
+
+.btn-link-dashboard {
+  color: var(--amber);
+  text-decoration-color: rgba(245, 166, 35, 0.25);
+}
+
+.btn-link-dashboard:hover {
+  color: var(--amber);
+  text-decoration-color: rgba(245, 166, 35, 0.6);
+}
+
+/* Dashboard button (summary page) */
+.summary-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.btn-dashboard {
+  background: var(--amber-soft);
+  color: var(--amber);
+  border: 1px solid rgba(245, 166, 35, 0.2);
+}
+
+.btn-dashboard:hover {
+  background: rgba(245, 166, 35, 0.18);
+  box-shadow: 0 4px 16px rgba(245, 166, 35, 0.12);
+  transform: translateY(-1px);
+}
+
 /* ===================== TASK LOG (yes path) ===================== */
 .task-log {
   width: 100%;

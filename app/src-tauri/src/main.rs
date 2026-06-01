@@ -79,6 +79,23 @@ fn reset_history() {
     save_history(&Vec::new());
 }
 
+#[tauri::command]
+fn open_dashboard(url: String) {
+    // Open the dashboard URL in the user's default browser
+    #[cfg(target_os = "linux")]
+    {
+        let _ = std::process::Command::new("xdg-open").arg(&url).spawn();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let _ = std::process::Command::new("open").arg(&url).spawn();
+    }
+    #[cfg(target_os = "windows")]
+    {
+        let _ = std::process::Command::new("cmd").args(["/c", "start", &url]).spawn();
+    }
+}
+
 static TIMER_STARTED: AtomicBool = AtomicBool::new(false);
 
 #[tauri::command]
@@ -101,9 +118,10 @@ fn start_timer(window: tauri::WebviewWindow, interval_minutes: f64) {
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
-            let show = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
-            let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&show, &quit])?;
+            let show      = MenuItem::with_id(app, "show",      "Show",      true, None::<&str>)?;
+            let dashboard = MenuItem::with_id(app, "dashboard", "Dashboard", true, None::<&str>)?;
+            let quit      = MenuItem::with_id(app, "quit",      "Quit",      true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&show, &dashboard, &quit])?;
 
             TrayIconBuilder::new()
                 .tooltip("Accountability Reminder")
@@ -115,6 +133,23 @@ fn main() {
                             if let Some(window) = app.get_webview_window("main") {
                                 let _ = window.show();
                                 let _ = window.set_focus();
+                            }
+                        }
+                        "dashboard" => {
+                            // Read the dashboard URL from the frontend config via JS eval,
+                            // falling back to the default URL.
+                            let url = "http://localhost:1422".to_string();
+                            #[cfg(target_os = "linux")]
+                            {
+                                let _ = std::process::Command::new("xdg-open").arg(&url).spawn();
+                            }
+                            #[cfg(target_os = "macos")]
+                            {
+                                let _ = std::process::Command::new("open").arg(&url).spawn();
+                            }
+                            #[cfg(target_os = "windows")]
+                            {
+                                let _ = std::process::Command::new("cmd").args(["/c", "start", &url]).spawn();
                             }
                         }
                         "quit" => app.exit(0),
@@ -134,7 +169,7 @@ fn main() {
                 api.prevent_close();
             }
         })
-        .invoke_handler(tauri::generate_handler![record_checkin, start_timer, update_last_commitment, reset_history])
+        .invoke_handler(tauri::generate_handler![record_checkin, start_timer, update_last_commitment, reset_history, open_dashboard])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

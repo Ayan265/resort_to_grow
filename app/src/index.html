@@ -55,7 +55,11 @@
           </button>
         </div>
       </div>
-      <button id="btn-summary" class="btn-link">Today's progress</button>
+      <div class="checkin-footer-links">
+        <button id="btn-summary" class="btn-link">Today's progress</button>
+        <span class="link-separator">·</span>
+        <button id="btn-dashboard" class="btn-link btn-link-dashboard">Open Dashboard</button>
+      </div>
     </div>
 
     <!-- ========== STEP: "Not Really" — Plea Page ========== -->
@@ -183,7 +187,10 @@
         <p class="summary-percent" id="summary-percent">0% focused today</p>
       </div>
       <div id="history-list" class="history-list"></div>
-      <button id="btn-back-from-summary" class="btn btn-small btn-back">Back</button>
+      <div class="summary-actions">
+        <button id="btn-back-from-summary" class="btn btn-small btn-back">Back</button>
+        <button id="btn-dashboard-from-summary" class="btn btn-small btn-dashboard">Open Full Dashboard</button>
+      </div>
     </div>
 
   </div>

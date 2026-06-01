@@ -12,6 +12,15 @@ export const CONFIG = {
   timerIntervalMinutes: 30,
 
   // ----------------------------------------------------------------
+  //  DASHBOARD
+  //  URL of the local analytics dashboard.
+  //  The dashboard server runs on this address (see dashboard/server.py).
+  //  Change the port here AND in dashboard/server.py if you want a
+  //  different one.
+  // ----------------------------------------------------------------
+  dashboardUrl: 'http://localhost:1422',
+
+  // ----------------------------------------------------------------
   //  IMAGES
   //  Place your image files in the src/images/ folder, then update names here.
   //  Use a leading slash: '/myimage.jpg'
