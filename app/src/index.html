@@ -34,8 +34,80 @@
     <!-- Step flow indicator -->
     <div id="step-flow-indicator"></div>
 
+    <!-- ========== ONBOARDING: Welcome ========== -->
+    <div class="step fade-in hidden" id="step-onboarding-welcome">
+      <div class="onboarding-icon">🎯</div>
+      <h1 class="onboarding-title">Welcome to Resort To Grow</h1>
+      <p class="onboarding-subtitle">A brutal accountability tool that helps you stay focused</p>
+      <div class="onboarding-explain">
+        <p>This app will pop up every <strong id="onboarding-interval">30</strong> minutes and ask:</p>
+        <p class="onboarding-question">"Are you really working hard right now?"</p>
+      </div>
+      <button id="btn-onboarding-next" class="btn btn-got-it">Let's set it up</button>
+    </div>
+
+    <!-- ========== ONBOARDING: Image Selection ========== -->
+    <div class="step fade-in hidden" id="step-onboarding-images">
+      <h1 class="onboarding-title">Choose Your Motivation</h1>
+      <p class="onboarding-subtitle">Select photos that matter to YOU — they'll keep you accountable</p>
+      <div class="onboarding-image-upload">
+        <div class="upload-slot" id="upload-main-photo">
+          <img id="preview-main-photo" src="/placeholder.jpg" alt="Main photo">
+          <span>Main Photo (check-in screen)</span>
+          <input type="file" accept="image/*" class="hidden-file-input" data-slot="mainPhoto">
+        </div>
+        <div class="upload-slot" id="upload-plea-image">
+          <img id="preview-plea-image" src="/placeholder.jpg" alt="Plea image">
+          <span>Plea Image (guilt-trip screen)</span>
+          <input type="file" accept="image/*" class="hidden-file-input" data-slot="pleaImage">
+        </div>
+      </div>
+      <p class="onboarding-hint">You can add more images later in Settings</p>
+      <div class="button-row">
+        <button id="btn-onboarding-skip-images" class="btn btn-secondary">Use placeholders</button>
+        <button id="btn-onboarding-images-next" class="btn btn-got-it">Continue</button>
+      </div>
+    </div>
+
+    <!-- ========== ONBOARDING: Timer Setup ========== -->
+    <div class="step fade-in hidden" id="step-onboarding-timer">
+      <h1 class="onboarding-title">Set Your Interval</h1>
+      <p class="onboarding-subtitle">How often should we check in on you?</p>
+      <div class="onboarding-timer">
+        <input type="range" id="onboarding-timer-slider" min="5" max="120" value="30">
+        <div class="timer-display">
+          <span id="onboarding-timer-value">30</span>
+          <span>minutes</span>
+        </div>
+      </div>
+      <div class="onboarding-timer-presets">
+        <button class="preset-btn" data-minutes="15">15 min</button>
+        <button class="preset-btn active" data-minutes="30">30 min</button>
+        <button class="preset-btn" data-minutes="60">60 min</button>
+      </div>
+      <button id="btn-onboarding-timer-next" class="btn btn-got-it">Continue</button>
+    </div>
+
+    <!-- ========== ONBOARDING: Complete ========== -->
+    <div class="step fade-in hidden" id="step-onboarding-complete">
+      <div class="onboarding-icon">✅</div>
+      <h1 class="onboarding-title">You're All Set!</h1>
+      <p class="onboarding-subtitle">The app will now start holding you accountable</p>
+      <div class="onboarding-summary">
+        <div class="summary-item">
+          <span class="summary-label">Check-in interval:</span>
+          <span class="summary-value" id="onboarding-summary-interval">30 minutes</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">First popup:</span>
+          <span class="summary-value">After your first interval</span>
+        </div>
+      </div>
+      <button id="btn-onboarding-start" class="btn btn-got-it">Start focusing</button>
+    </div>
+
     <!-- ========== STEP 1: The Check-In ========== -->
-    <div class="step fade-in" id="step-checkin">
+    <div class="step fade-in hidden" id="step-checkin">
       <p class="greeting" id="greeting-text">Hey...</p>
       <h1 class="main-question">Are you really working hard<br>right now?</h1>
       <p class="sub-text" id="trigger-quote">"Your future self is watching."</p>

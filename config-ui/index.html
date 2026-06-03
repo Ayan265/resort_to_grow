@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resort To Grow — Configuration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="brand">
+                <h1>RESORT TO GROW</h1>
+                <p>Configuration</p>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="settings">Settings</button>
+                <button class="nav-tab" data-tab="images">Images</button>
+                <button class="nav-tab" data-tab="messages">Messages</button>
+                <button class="nav-tab" data-tab="journey">Journey</button>
+                <button class="nav-tab" data-tab="actions">Actions</button>
+            </nav>
+        </header>
+
+        <!-- Settings Tab -->
+        <section class="tab-content active" id="tab-settings">
+            <div class="card">
+                <h2 class="card-title">Timer Settings</h2>
+                <div class="form-group">
+                    <label>Popup Interval</label>
+                    <div class="slider-group">
+                        <input type="range" id="timer-slider" min="5" max="120" value="30">
+                        <input type="number" id="timer-input" min="1" max="120" value="30" class="small-input">
+                        <span class="unit">minutes</span>
+                    </div>
+                    <p class="help-text">How often the popup appears. 30 min recommended.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Personal Info</h2>
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="user-name" placeholder="Enter your name">
+                    <p class="help-text">Used in motivation messages</p>
+                </div>
+                <div class="form-group">
+                    <label>Dashboard URL</label>
+                    <input type="text" id="dashboard-url" value="http://localhost:1422">
+                </div>
+            </div>
+        </section>
+
+        <!-- Images Tab -->
+        <section class="tab-content" id="tab-images">
+            <div class="card">
+                <h2 class="card-title">Image Slots</h2>
+                <p class="card-description">Click on an image slot to upload, or drag and drop images below.</p>
+                
+                <div class="image-grid" id="image-grid">
+                    <!-- Images populated by JS -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Upload Images</h2>
+                <div class="upload-zone" id="upload-zone">
+                    <div class="upload-icon">📁</div>
+                    <p>Drag & drop images here</p>
+                    <p class="help-text">or click to browse</p>
+                    <input type="file" id="file-input" accept="image/*" multiple hidden>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Current Images</h2>
+                <div class="image-list" id="image-list">
+                    <!-- Image list populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Messages Tab -->
+        <section class="tab-content" id="tab-messages">
+            <div class="card">
+                <h2 class="card-title">"Not Really" Flow</h2>
+                <div class="form-group">
+                    <label>Plea Question</label>
+                    <input type="text" id="plea-question" placeholder="[Name], don't you want to...?">
+                    <p class="help-text">Shown when user clicks "Not really"</p>
+                </div>
+                <div class="form-group">
+                    <label>Plea Button Text</label>
+                    <input type="text" id="plea-button" placeholder="I will work hard">
+                </div>
+                <div class="form-group">
+                    <label>Worthy Button Text</label>
+                    <input type="text" id="worthy-button" placeholder="I have to become worthy">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">"Yes" Flow</h2>
+                <div class="form-group">
+                    <label>Check-in Question</label>
+                    <input type="text" id="checkin-question" value="Are you really working hard right now?">
+                </div>
+                <div class="form-group">
+                    <label>Yes Button</label>
+                    <input type="text" id="yes-button" value="Yes, I am">
+                </div>
+                <div class="form-group">
+                    <label>No Button</label>
+                    <input type="text" id="no-button" value="Not really">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Motivational Quotes</h2>
+                <div class="form-group">
+                    <label>Trigger Quotes</label>
+                    <textarea id="trigger-quotes" rows="4" placeholder="One quote per line"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Yes Headlines</label>
+                    <textarea id="yes-headlines" rows="3" placeholder="One headline per line"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Encouragement</label>
+                    <textarea id="encouragement-quotes" rows="3" placeholder="One quote per line"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Journey Tab -->
+        <section class="tab-content" id="tab-journey">
+            <div class="card">
+                <h2 class="card-title">Affirmation Journey</h2>
+                <p class="card-description">These screens appear when user clicks "Yes, I am". Drag to reorder.</p>
+                
+                <div class="journey-list" id="journey-list">
+                    <!-- Journey steps populated by JS -->
+                </div>
+                
+                <button class="btn btn-secondary" id="add-journey-step">+ Add Step</button>
+            </div>
+        </section>
+
+        <!-- Actions Tab -->
+        <section class="tab-content" id="tab-actions">
+            <div class="card">
+                <h2 class="card-title">Save Configuration</h2>
+                <p class="card-description">Save your changes to config.js</p>
+                <button class="btn btn-primary" id="save-config">Save Configuration</button>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Import / Export</h2>
+                <p class="card-description">Share your configuration with others</p>
+                <div class="button-group">
+                    <button class="btn btn-secondary" id="export-config">Export as JSON</button>
+                    <button class="btn btn-secondary" id="import-config">Import from JSON</button>
+                    <input type="file" id="import-file" accept=".json" hidden>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Reset</h2>
+                <p class="card-description">Reset all settings to defaults</p>
+                <button class="btn btn-danger" id="reset-config">Reset to Defaults</button>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Build App</h2>
+                <p class="card-description">Rebuild the app with new settings</p>
+                <button class="btn btn-primary" id="rebuild-app">Rebuild App</button>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Reset Onboarding</h2>
+                <p class="card-description">Show the onboarding tutorial again on next popup</p>
+                <button class="btn btn-secondary" id="reset-onboarding">Reset Onboarding</button>
+            </div>
+        </section>
+
+        <!-- Toast Notification -->
+        <div class="toast" id="toast">
+            <span class="toast-message"></span>
+        </div>
+    </div>
+
+    <script src="./app.js"></script>
+</body>
+</html>

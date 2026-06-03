@@ -33,6 +33,7 @@ function randomFrom(arr) {
 // =====================================================
 
 const STORAGE_KEY = 'accountability_history';
+const ONBOARDING_KEY = 'accountability_onboarding_completed';
 
 function getHistory() {
   try {
@@ -65,6 +66,14 @@ function getCurrentStreak() {
 function resetAllData() {
   localStorage.removeItem(STORAGE_KEY);
   tauriInvoke?.('reset_history').catch(() => {});
+}
+
+function isOnboardingCompleted() {
+  return localStorage.getItem(ONBOARDING_KEY) === 'true';
+}
+
+function completeOnboarding() {
+  localStorage.setItem(ONBOARDING_KEY, 'true');
 }
 
 // =====================================================
@@ -127,7 +136,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   applyConfig();
 
   // Start the background timer loop in Rust
-  if (tauriInvoke && CONFIG.timerIntervalMinutes) {
+  // (Only if onboarding is already done — otherwise the onboarding
+  //  completion handler starts the timer with the user-selected interval)
+  if (tauriInvoke && CONFIG.timerIntervalMinutes && isOnboardingCompleted()) {
     tauriInvoke('start_timer', { intervalMinutes: CONFIG.timerIntervalMinutes })
       .catch(err => console.error('[accountability] Failed to start timer:', err));
   }
@@ -153,8 +164,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const stepProblem    = document.getElementById('step-problem');
   const stepAdvice     = document.getElementById('step-advice');
   const stepSummary    = document.getElementById('step-summary');
-  const allSteps = [stepCheckin, stepNoPlea, stepNoImages, stepYesJourney, stepYes, stepProblem, stepAdvice, stepSummary];
-  const stepsWithOwnImage = [stepNoPlea, stepNoImages, stepYesJourney, stepSummary];
+  
+  // Onboarding steps
+  const stepOnboardingWelcome   = document.getElementById('step-onboarding-welcome');
+  const stepOnboardingImages    = document.getElementById('step-onboarding-images');
+  const stepOnboardingTimer     = document.getElementById('step-onboarding-timer');
+  const stepOnboardingComplete  = document.getElementById('step-onboarding-complete');
+  
+  const allSteps = [stepCheckin, stepNoPlea, stepNoImages, stepYesJourney, stepYes, stepProblem, stepAdvice, stepSummary, stepOnboardingWelcome, stepOnboardingImages, stepOnboardingTimer, stepOnboardingComplete];
+  const stepsWithOwnImage = [stepNoPlea, stepNoImages, stepYesJourney, stepSummary, stepOnboardingImages];
 
   // --- DOM: Layout ---
   const containerEl         = document.querySelector('.container');
@@ -393,10 +411,155 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // =====================================================
+  //  ONBOARDING
+  // =====================================================
+
+  // Onboarding state
+  let selectedImages = {
+    mainPhoto: '/placeholder.jpg',
+    pleaImage: '/placeholder.jpg'
+  };
+  let selectedTimer = CONFIG.timerIntervalMinutes;
+
+  function initOnboarding() {
+    // Set initial values from config
+    selectedTimer = CONFIG.timerIntervalMinutes;
+    document.getElementById('onboarding-interval').textContent = selectedTimer;
+    document.getElementById('onboarding-timer-slider').value = selectedTimer;
+    document.getElementById('onboarding-timer-value').textContent = selectedTimer;
+    document.getElementById('onboarding-summary-interval').textContent = `${selectedTimer} minutes`;
+    
+    // Update preset buttons
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.minutes) === selectedTimer);
+    });
+    
+    showStep(stepOnboardingWelcome);
+  }
+
+  function setupOnboarding() {
+    // Welcome next button
+    document.getElementById('btn-onboarding-next').addEventListener('click', () => {
+      showStep(stepOnboardingImages);
+    });
+
+    // Image upload slots
+    document.querySelectorAll('.upload-slot').forEach(slot => {
+      slot.addEventListener('click', () => {
+        const fileInput = slot.querySelector('.hidden-file-input');
+        fileInput.click();
+      });
+    });
+
+    // File input handlers
+    document.querySelectorAll('.hidden-file-input').forEach(input => {
+      input.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const slot = input.dataset.slot;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const imgUrl = event.target.result;
+          selectedImages[slot] = imgUrl;
+          
+          // Update preview
+          if (slot === 'mainPhoto') {
+            document.getElementById('preview-main-photo').src = imgUrl;
+          } else if (slot === 'pleaImage') {
+            document.getElementById('preview-plea-image').src = imgUrl;
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    // Skip images button
+    document.getElementById('btn-onboarding-skip-images').addEventListener('click', () => {
+      showStep(stepOnboardingTimer);
+    });
+
+    // Images next button
+    document.getElementById('btn-onboarding-images-next').addEventListener('click', () => {
+      showStep(stepOnboardingTimer);
+    });
+
+    // Timer slider
+    const timerSlider = document.getElementById('onboarding-timer-slider');
+    const timerValue = document.getElementById('onboarding-timer-value');
+    
+    timerSlider.addEventListener('input', () => {
+      selectedTimer = parseInt(timerSlider.value);
+      timerValue.textContent = selectedTimer;
+      document.getElementById('onboarding-summary-interval').textContent = `${selectedTimer} minutes`;
+      
+      // Update preset buttons
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.minutes) === selectedTimer);
+      });
+    });
+
+    // Timer presets
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedTimer = parseInt(btn.dataset.minutes);
+        timerSlider.value = selectedTimer;
+        timerValue.textContent = selectedTimer;
+        document.getElementById('onboarding-summary-interval').textContent = `${selectedTimer} minutes`;
+        
+        // Update preset buttons
+        document.querySelectorAll('.preset-btn').forEach(b => {
+          b.classList.toggle('active', b === btn);
+        });
+      });
+    });
+
+    // Timer next button
+    document.getElementById('btn-onboarding-timer-next').addEventListener('click', () => {
+      showStep(stepOnboardingComplete);
+    });
+
+    // Start button (complete onboarding)
+    document.getElementById('btn-onboarding-start').addEventListener('click', () => {
+      // Save selections
+      if (selectedImages.mainPhoto !== '/placeholder.jpg') {
+        CONFIG.images.mainPhoto = selectedImages.mainPhoto;
+      }
+      if (selectedImages.pleaImage !== '/placeholder.jpg') {
+        CONFIG.images.pleaImage = selectedImages.pleaImage;
+      }
+      CONFIG.timerIntervalMinutes = selectedTimer;
+      
+      // Update DOM with new config
+      applyConfig();
+      
+      // Mark onboarding as completed
+      completeOnboarding();
+      
+      // Start timer with new interval
+      if (tauriInvoke && CONFIG.timerIntervalMinutes) {
+        tauriInvoke('start_timer', { intervalMinutes: CONFIG.timerIntervalMinutes })
+          .catch(err => console.error('[accountability] Failed to start timer:', err));
+      }
+      
+      // Show check-in
+      showStep(stepCheckin);
+      initCheckin();
+    });
+  }
+
+  // =====================================================
   //  CHECK-IN STEP
   // =====================================================
 
-  initCheckin();
+  // Check if onboarding is needed
+  if (!isOnboardingCompleted()) {
+    initOnboarding();
+    setupOnboarding();
+  } else {
+    showStep(stepCheckin, true);
+    initCheckin();
+  }
 
   btnSummary.addEventListener('click', () => {
     renderSummary();

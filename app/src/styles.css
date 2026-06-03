@@ -1312,3 +1312,229 @@ body::before {
     gap: 12px;
   }
 }
+
+/* ===================== ONBOARDING ===================== */
+.onboarding-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.onboarding-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.onboarding-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  text-align: center;
+  max-width: 320px;
+}
+
+.onboarding-explain {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.onboarding-explain p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.onboarding-question {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--amber);
+  font-style: italic;
+}
+
+.onboarding-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* Onboarding Image Upload */
+.onboarding-image-upload {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.upload-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-slot:hover {
+  transform: scale(1.02);
+}
+
+.upload-slot img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px dashed var(--glass-border);
+  transition: border-color 0.2s ease;
+}
+
+.upload-slot:hover img {
+  border-color: var(--amber);
+}
+
+.upload-slot span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: center;
+  max-width: 120px;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+/* Onboarding Timer */
+.onboarding-timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.onboarding-timer input[type="range"] {
+  width: 100%;
+  max-width: 280px;
+  height: 6px;
+  background: var(--bg-card);
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.onboarding-timer input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--amber);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 12px var(--amber-glow);
+}
+
+.timer-display {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.timer-display span:first-child {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--amber);
+  font-family: var(--font);
+}
+
+.timer-display span:last-child {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.onboarding-timer-presets {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.preset-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preset-btn:hover {
+  border-color: var(--amber);
+  color: var(--text-primary);
+}
+
+.preset-btn.active {
+  background: var(--amber-soft);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* Onboarding Complete */
+.onboarding-summary {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.summary-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--amber);
+}
+
+/* Onboarding button row */
+#step-onboarding-images .button-row {
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--amber);
+  color: var(--text-primary);
+}
